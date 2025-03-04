@@ -10,6 +10,7 @@ const app = express();
 app.use(cors({origin:'http://localhost:5173',credentials:true}))
 
 app.use(express.json());
+connectDB();
 
 app.use('/api/v1/user',userRouter)
 
@@ -19,7 +20,7 @@ app.get("/", (req, res) => {
 
 
 
-connectDB();
+
 
 
 
