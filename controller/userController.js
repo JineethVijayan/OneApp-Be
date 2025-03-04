@@ -34,10 +34,10 @@ export const sendOtp = async (req, res) => {
 
         await sendOtpEmail(email, otp);
 
-        res.status(200).json({ message: "OTP sent successfully to your  email!" });
+        return  res.status(200).json({ message: "OTP sent successfully to your  email!" });
 
     } catch (error) {
-        res.status(500).json({ message: "Error sending OTP.", error });
+        return res.status(500).json({ message: "Error sending OTP.", error });
         console.log(error);
 
     }
@@ -57,10 +57,10 @@ export const checkUserEmail = async (req, res) => {
 
         if (emailExist) return res.status(400).json({ message: "Email already exists" });
 
-        res.status(200).json({ message: "Email available" });
+        return res.status(200).json({ message: "Email available" });
 
     } catch (error) {
-        res.status(500).json({ message: "An error occurred while checking if the email already exists" });
+        return res.status(500).json({ message: "An error occurred while checking if the email already exists" });
     }
 
 }
@@ -75,10 +75,10 @@ export const checkUserName = async (req, res) => {
 
         if (userNameExist) return res.status(400).json({ message: "User name already exists" });
 
-        res.status(200).json({ message: "User name available" });
+        return res.status(200).json({ message: "User name available" });
 
     } catch (error) {
-        res.status(500).json({ message: "An error occurred while checking if the user name already exists" });
+        return res.status(500).json({ message: "An error occurred while checking if the user name already exists" });
     }
 }
 
@@ -101,10 +101,10 @@ export const checkOtp = async (req, res) => {
 
         await Otp.deleteOne({ email });
 
-        res.status(200).json({ message: "Otp verified successfully" });
+        return res.status(200).json({ message: "Otp verified successfully" });
 
     } catch (error) {
-        res.status(500).json({ message: "error verifying otp" })
+        return res.status(500).json({ message: "error verifying otp" })
     }
 }
 
@@ -148,10 +148,10 @@ export const createUser = async (req, res) => {
 
        delete userResponse.password ;
 
-        res.status(200).json({ message: "user registered successfully",user:userResponse,token });
+       return res.status(200).json({ message: "user registered successfully",user:userResponse,token });
 
     } catch (error) {
-        res.status(500).json({ message: "Error creating user", error });
+        return res.status(500).json({ message: "Error creating user", error });
         console.log(error);
 
     }
@@ -192,10 +192,10 @@ export const login = async (req, res) => {
 
         delete logedUser.password ;
 
-        res.json({ message: "Login successful" ,user:logedUser,token});
+        return res.json({ message: "Login successful" ,user:logedUser,token});
 
     } catch (error) {
-        res.status(500).json({ message: "Server error", error });
+        return res.status(500).json({ message: "Server error", error });
         console.log(error);
 
     }
