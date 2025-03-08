@@ -3,6 +3,7 @@ import bcrypt from "bcrypt"
 import { sendOtpEmail } from "../utils/mailer.js";
 import Otp from "../models/OtpModel.js";
 import { userToken } from "../utils/generateToken.js";
+import { cloudinaryInstance } from "../config/cloudinary.js";
 
 
 
@@ -196,7 +197,100 @@ export const login = async (req, res) => {
 
     } catch (error) {
         return res.status(500).json({ message: "Server error", error });
-        console.log(error);
-
     }
 }
+
+export const getCurrentUser = async (req,res)=>{
+    try {
+       console.log("getuser profile reach",req.user.data);
+
+       const email = req.user.data ;
+
+       if(!email) return res.status(400).json({message:'email missing unauthorized'})
+       
+       const user = await User.findOne({email});
+       if (!user){
+           return res.status(404).json({message:'user not found'});
+       }
+
+       return res.status(200).json(user);
+ 
+   } catch (error) {
+       res.status(500).json({message:'Server error'})
+      }
+  }
+
+
+export const updateUser = async (req, res) => {
+    try {
+        // console.log(req.files);
+        // console.log(req.body);
+        
+        const { userId, name, description, links, profession } = req.body;
+
+        if (!userId) {
+            return res.status(400).json({ message: "user id  required" });
+        }
+
+        let user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Ensure images are provided if this is the first time adding them
+
+
+
+        if (!user.bannerImage && !req.files?.bannerImage) {
+            return res.status(400).json({ message: "Banner image is required" });
+        }
+        if (!user.profileImage && !req.files?.profileImage) {
+            return res.status(400).json({ message: "Profile image is required" });
+        }
+
+        // Upload new images to Cloudinary
+        let bannerImage = user.bannerImage;
+        let profileImage = user.profileImage;
+
+        const uploadToCloudinary = (buffer, folder) => {
+            return new Promise((resolve, reject) => {
+                const stream = cloudinaryInstance.uploader.upload_stream(
+                    { folder, resource_type: "image" },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result.secure_url);
+                    }
+                );
+                stream.end(buffer);
+            });
+        };
+
+        if (req.files?.bannerImage) {
+            bannerImage = await uploadToCloudinary(req.files.bannerImage[0].buffer, "banners");
+        }
+
+        if (req.files?.profileImage) {
+            profileImage = await uploadToCloudinary(req.files.profileImage[0].buffer, "profiles");
+        }
+
+        // Update user with the new data
+        user = await User.findByIdAndUpdate(
+            userId,
+            {
+                name,
+                description,
+                links,
+                profession,
+                bannerImage,
+                profileImage,
+            },
+            { new: true }
+        );
+
+        return res.status(200).json({ message: "User data updated", user });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Server error", error: error.message });
+    }
+};

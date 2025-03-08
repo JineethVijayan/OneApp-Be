@@ -32,6 +32,24 @@ const UserSchema = new mongoose.Schema(
       type: String,
       enum: ["user", "manager", "admin"]
     },
+    name: {
+      type: String
+    },
+    description: {
+      type: String
+    },
+    links: {
+      type: [String]
+    },
+    profession: {
+      type: String
+    },
+    bannerImage:{
+      type:String
+    },
+    profileImage:{
+      type:String
+    }
   },
   { timestamps: true }
 );
